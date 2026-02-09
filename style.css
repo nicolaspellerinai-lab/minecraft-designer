@@ -40,6 +40,7 @@ body {
 .main-content {
     display: flex;
     flex-grow: 1;
+    min-height: 0; /* Constrain height to allow children to scroll */
 }
 
 .sidebar {
@@ -48,6 +49,7 @@ body {
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--border-color);
+    min-height: 0; /* Constrain height to allow children to scroll */
 }
 
 .sidebar-header {
@@ -64,19 +66,33 @@ body {
 }
 
 #category-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    padding: 8px;
     border-bottom: 1px solid var(--border-color);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Custom scrollbar for a better look */
+#category-tabs::-webkit-scrollbar, #asset-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+#category-tabs::-webkit-scrollbar-thumb, #asset-grid::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 3px;
 }
 
 .category-tab {
     cursor: pointer;
-    padding: 8px 12px;
+    padding: 6px;
     text-align: center;
     border-radius: 4px;
     transition: background-color 0.2s;
-    flex-grow: 1;
+    font-size: 0.85em;
+    background: rgba(255,255,255,0.05);
 }
 
 .category-tab:hover {
@@ -92,18 +108,21 @@ body {
 }
 
 #asset-grid {
-    flex-grow: 1;
+    flex: 1;
     overflow-y: auto;
     padding: 10px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+    grid-template-columns: repeat(auto-fill, 64px);
+    grid-auto-rows: 64px;
+    align-content: start;
     gap: 10px;
+    min-height: 0;
 }
 
 .asset-item {
-    width: 48px;
-    height: 48px;
-    background-color: var(--bg-dark);
+    width: 64px;
+    height: 64px;
+    background: radial-gradient(circle, #87CEEB, #B0E0E6);
     border: 1px solid var(--border-color);
     cursor: grab;
     display: flex;
@@ -118,8 +137,9 @@ body {
     box-shadow: 0 0 10px var(--accent-glow);
 }
 .asset-item img {
-    width: 32px;
-    height: 32px;
+    width: 56px;
+    height: 56px;
+    image-rendering: pixelated;
     object-fit: contain;
 }
 
@@ -142,6 +162,7 @@ body {
     background-color: var(--panel-dark);
     padding: 15px;
     border-left: 1px solid var(--border-color);
+    overflow-y: auto;
 }
 
 .properties-panel h3 {

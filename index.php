@@ -99,14 +99,14 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="assets-data.js?t=2025020818"></script>
-    <script src="utils.js?t=2025020817"></script>
-    <script src="history.js?t=2025020817"></script>
-    <script src="transform.js?t=2025020817"></script>
-    <script src="selection.js?t=2025020817"></script>
-    <script src="dragdrop.js?t=2025020817"></script>
-    <script src="canvas.js?t=2025020817"></script>
-    <script src="export.js?t=2025020817"></script>
-    <script src="app.js?t=2025020817"></script>
+    <script src="assets-data.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="utils.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="history.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="transform.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="selection.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="dragdrop.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="canvas.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="export.js?t=<?php echo date("YmdHis"); ?>"></script>
+    <script src="app.js?t=<?php echo date("YmdHis"); ?>"></script>
 </body>
 </html>
