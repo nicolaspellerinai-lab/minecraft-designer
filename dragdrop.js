@@ -25,35 +25,50 @@ class DragDrop {
     }
 
     handleAssetDragStart(e) {
-        if (e.target.classList.contains('asset-item')) {
-            this.draggedAssetId = e.target.dataset.assetId;
-            // You can also set a custom drag image here if you want
+        const item = e.target.closest('.asset-item');
+        if (item) {
+            this.draggedAssetId = item.dataset.assetId;
+            this.draggedAssetPath = item.dataset.assetPath;
+            this.draggedAssetName = item.dataset.assetName;
+            e.dataTransfer.setData('text/plain', this.draggedAssetId);
+            e.dataTransfer.effectAllowed = 'move';
         }
     }
 
     handleCanvasDrop(e) {
         e.preventDefault();
-        if (this.draggedAssetId) {
+        if (this.draggedAssetId && this.draggedAssetPath) {
             const coords = this.canvas.getCanvasCoordinates(e);
             
-            // In a real app, you'd get asset properties from a config
             const newElement = {
                 id: Utils.uuid(),
                 assetId: this.draggedAssetId,
-                x: coords.x - 32 / 2, // Center the item on the cursor
-                y: coords.y - 32 / 2,
-                width: 32,
-                height: 32,
+                assetName: this.draggedAssetName,
+                x: coords.x - 48 / 2,
+                y: coords.y - 48 / 2,
+                width: 48,
+                height: 48,
                 image: new Image(),
                 zIndex: this.canvas.elements.length
             };
-            newElement.image.src = `https://via.placeholder.com/32/FF0000?text=${this.draggedAssetId}`; // Placeholder
+            
+            newElement.image.src = this.draggedAssetPath;
             
             newElement.image.onload = () => {
                 const command = new AddElementCommand(this.canvas, newElement);
                 this.app.history.add(command);
-                this.draggedAssetId = null;
-            }
+                this.canvas.render();
+            };
+            
+            newElement.image.onerror = () => {
+                console.error('Failed to load image:', this.draggedAssetPath);
+                // Use fallback
+                newElement.image.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32"%3E%3Crect fill="%23ff00ff" stroke="%23000" width="32" height="32"/%3E%3Ctext x="16" y="20" text-anchor="middle" font-size="8"%3E?%3C/text%3E%3C/svg%3E';
+            };
+            
+            this.draggedAssetId = null;
+            this.draggedAssetPath = null;
+            this.draggedAssetName = null;
         }
     }
     

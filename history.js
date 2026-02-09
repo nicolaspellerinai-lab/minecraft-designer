@@ -6,13 +6,15 @@ class History {
         this.MAX_HISTORY = 50;
     }
 
-    add(command) {
+    add(command, shouldExecute = true) {
         this.undoStack.push(command);
         this.redoStack = []; // Clear redo stack on new action
         if (this.undoStack.length > this.MAX_HISTORY) {
             this.undoStack.shift(); // Remove the oldest command
         }
-        command.execute();
+        if (shouldExecute) {
+            command.execute();
+        }
         this.app.updateUI();
     }
 

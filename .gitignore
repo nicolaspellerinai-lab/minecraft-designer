@@ -1,0 +1,18 @@
+# Assets textures - too large
+assets/textures/
+assets/textures/*
+
+# Other large files
+*.zip
+*.tar.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
