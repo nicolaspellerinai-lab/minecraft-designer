@@ -13,51 +13,38 @@ jobs:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
       
-    - name: 🚀 Upload database.php via FTP
+    - name: 🚀 Upload dashboard files via FTP
       env:
         FTP_USER: ${{ secrets.FTP_USER }}
         FTP_PASS: ${{ secrets.FTP_PASS }}
       run: |
+        # URL-encode credentials for curl
+        USER_ENC=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${FTP_USER}', safe=''))")
+        PASS_ENC=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${FTP_PASS}', safe=''))")
+        
         echo "=== Uploading database.php ==="
-        curl -v -T dashboard/database.php \
-          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/database.php" \
-          --ftp-pasv -k 2>&1 | tail -20
-        echo "EXIT_CODE: $?"
+        curl -T dashboard/database.php \
+          "ftp://${USER_ENC}:${PASS_ENC}@lepetitweb.com:21/oc/dashboard/database.php" \
+          --ftp-pasv -k 2>&1 | tail -10
         
-    - name: 🚀 Upload api.php via FTP
-      env:
-        FTP_USER: ${{ secrets.FTP_USER }}
-        FTP_PASS: ${{ secrets.FTP_PASS }}
-      run: |
+        echo "=== Uploading api.php ==="
         curl -T dashboard/api.php \
-          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/api.php" \
+          "ftp://${USER_ENC}:${PASS_ENC}@lepetitweb.com:21/oc/dashboard/api.php" \
           --ftp-pasv -k 2>&1 | tail -5
         
-    - name: 🚀 Upload config.php via FTP
-      env:
-        FTP_USER: ${{ secrets.FTP_USER }}
-        FTP_PASS: ${{ secrets.FTP_PASS }}
-      run: |
+        echo "=== Uploading config.php ==="
         curl -T dashboard/config.php \
-          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/config.php" \
+          "ftp://${USER_ENC}:${PASS_ENC}@lepetitweb.com:21/oc/dashboard/config.php" \
           --ftp-pasv -k 2>&1 | tail -5
         
-    - name: 🚀 Upload api/index.php via FTP
-      env:
-        FTP_USER: ${{ secrets.FTP_USER }}
-        FTP_PASS: ${{ secrets.FTP_PASS }}
-      run: |
+        echo "=== Uploading api/index.php ==="
         curl -T dashboard/api/index.php \
-          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/api/index.php" \
+          "ftp://${USER_ENC}:${PASS_ENC}@lepetitweb.com:21/oc/dashboard/api/index.php" \
           --ftp-pasv -k 2>&1 | tail -5
         
-    - name: 🚀 Upload api/config_endpoints.php via FTP
-      env:
-        FTP_USER: ${{ secrets.FTP_USER }}
-        FTP_PASS: ${{ secrets.FTP_PASS }}
-      run: |
+        echo "=== Uploading api/config_endpoints.php ==="
         curl -T dashboard/api/config_endpoints.php \
-          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/api/config_endpoints.php" \
+          "ftp://${USER_ENC}:${PASS_ENC}@lepetitweb.com:21/oc/dashboard/api/config_endpoints.php" \
           --ftp-pasv -k 2>&1 | tail -5
         
     - name: 🔍 Verify deployment
