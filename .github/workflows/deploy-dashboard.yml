@@ -13,42 +13,55 @@ jobs:
     - name: 📥 Checkout repository
       uses: actions/checkout@v4
       
-    - name: 🔧 Setup FTP client
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y lftp
-        
-    - name: 🚀 Deploy dashboard to FTP
+    - name: 🚀 Upload database.php via FTP
       env:
-        FTP_HOST: ${{ secrets.FTP_HOST }}
         FTP_USER: ${{ secrets.FTP_USER }}
         FTP_PASS: ${{ secrets.FTP_PASS }}
       run: |
-        cat > deploy.lftp << 'EOF'
-        set ssl:verify-certificate no
-        set ftp:ssl-allow yes
-        set net:max-retries 3
-        set net:timeout 30
+        echo "=== Uploading database.php ==="
+        curl -v -T dashboard/database.php \
+          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/database.php" \
+          --ftp-pasv -k 2>&1 | tail -20
+        echo "EXIT_CODE: $?"
         
-        open -u $FTP_USER,$FTP_PASS $FTP_HOST
+    - name: 🚀 Upload api.php via FTP
+      env:
+        FTP_USER: ${{ secrets.FTP_USER }}
+        FTP_PASS: ${{ secrets.FTP_PASS }}
+      run: |
+        curl -T dashboard/api.php \
+          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/api.php" \
+          --ftp-pasv -k 2>&1 | tail -5
         
-        cd dashboard
+    - name: 🚀 Upload config.php via FTP
+      env:
+        FTP_USER: ${{ secrets.FTP_USER }}
+        FTP_PASS: ${{ secrets.FTP_PASS }}
+      run: |
+        curl -T dashboard/config.php \
+          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/config.php" \
+          --ftp-pasv -k 2>&1 | tail -5
         
-        # Upload dashboard files
-        put database.php
-        put api.php
-        put config.php
-        cd api
-        put index.php
-        put config_endpoints.php
-        cd ..
+    - name: 🚀 Upload api/index.php via FTP
+      env:
+        FTP_USER: ${{ secrets.FTP_USER }}
+        FTP_PASS: ${{ secrets.FTP_PASS }}
+      run: |
+        curl -T dashboard/api/index.php \
+          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/api/index.php" \
+          --ftp-pasv -k 2>&1 | tail -5
         
-        bye
-        EOF
-        
-        lftp -f deploy.lftp 2>&1
+    - name: 🚀 Upload api/config_endpoints.php via FTP
+      env:
+        FTP_USER: ${{ secrets.FTP_USER }}
+        FTP_PASS: ${{ secrets.FTP_PASS }}
+      run: |
+        curl -T dashboard/api/config_endpoints.php \
+          "ftp://${FTP_USER}:${FTP_PASS}@lepetitweb.com:21/oc/dashboard/api/config_endpoints.php" \
+          --ftp-pasv -k 2>&1 | tail -5
         
     - name: 🔍 Verify deployment
       run: |
-        sleep 2
-        curl -s "https://lepetitweb.com/oc/dashboard/api.php?path=kanban" | head -5
+        sleep 3
+        echo "=== Checking dashboard ==="
+        curl -s "https://lepetitweb.com/oc/dashboard/api.php?path=kanban" 2>&1 | head -5
