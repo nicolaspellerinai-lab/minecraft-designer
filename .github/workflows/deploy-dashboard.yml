@@ -1,0 +1,54 @@
+name: 🚀 Deploy Dashboard
+
+on:
+  push:
+    branches: [ dashboard-deploy ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup FTP client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lftp
+        
+    - name: 🚀 Deploy dashboard to FTP
+      env:
+        FTP_HOST: ${{ secrets.FTP_HOST }}
+        FTP_USER: ${{ secrets.FTP_USER }}
+        FTP_PASS: ${{ secrets.FTP_PASS }}
+      run: |
+        cat > deploy.lftp << 'EOF'
+        set ssl:verify-certificate no
+        set ftp:ssl-allow yes
+        set net:max-retries 3
+        set net:timeout 30
+        
+        open -u $FTP_USER,$FTP_PASS $FTP_HOST
+        
+        cd dashboard
+        
+        # Upload dashboard files
+        put database.php
+        put api.php
+        put config.php
+        cd api
+        put index.php
+        put config_endpoints.php
+        cd ..
+        
+        bye
+        EOF
+        
+        lftp -f deploy.lftp 2>&1
+        
+    - name: 🔍 Verify deployment
+      run: |
+        sleep 2
+        curl -s "https://lepetitweb.com/oc/dashboard/api.php?path=kanban" | head -5
